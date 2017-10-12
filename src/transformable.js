@@ -1,7 +1,10 @@
-const transformable = {
-  greet() {
-    return 'hello';
+class Transformable {
+  constructor() {
   }
-};
 
-export default transformable;
+  greet() {
+    return 'hello world';
+  }
+}
+
+export default Transformable;

@@ -15,7 +15,15 @@
     "type": "git",
     "url": "https://github.com/Haerezis/transformable.git"
   },
-  "keywords": ["ES6", "scaling", "resize", "rotation", "translation", "move", "handle"],
+  "keywords": [
+    "ES6",
+    "scaling",
+    "resize",
+    "rotation",
+    "translation",
+    "move",
+    "handle"
+  ],
   "author": "Thomas Kuntz <thomaskuntz67@gmail.com>",
   "license": "MIT",
   "bugs": {
@@ -42,6 +50,7 @@
     "gulp-rename": "1.2.2",
     "gulp-sourcemaps": "1.6.0",
     "gulp-uglify": "2.0.0",
+    "holderjs": "^2.9.4",
     "isparta": "4.0.0",
     "json-loader": "0.5.4",
     "mocha": "3.0.2",
