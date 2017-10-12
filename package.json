@@ -62,5 +62,8 @@
   "babelBoilerplateOptions": {
     "entryFileName": "transformable.js",
     "mainVarName": "transformable"
+  },
+  "dependencies": {
+    "minivents": "^2.2.0"
   }
 }

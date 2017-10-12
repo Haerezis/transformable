@@ -119,7 +119,7 @@ function watch() {
 }
 
 function example() {
-  const allFiles = ['./test/example.js'];
+  const allFiles = ['./test/example/index.js'];
 
   // Lets us differentiate between the first build and subsequent builds
   var firstBuild = true;

@@ -1,9 +1,15 @@
+import Events from 'minivents'
+
 class Transformable {
-  constructor() {
+  constructor(element, container) {
+    Events(this);
+
+    this.element = element;
+    this.container = container;
   }
 
   greet() {
-    return 'hello world';
+    console.log('hello world');
   }
 }
 

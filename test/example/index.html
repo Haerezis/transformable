@@ -5,17 +5,21 @@
   <meta charset='utf-8'>
   <title>Examples</title>
   <!-- Polyfill (required by Babel) -->
-  <script src='../node_modules/babel-polyfill/dist/polyfill.js'></script>
+  <script src='../../node_modules/babel-polyfill/dist/polyfill.js'></script>
   
   <!-- Livereload -->
   <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35730/livereload.js?snipver=1"></' + 'script>')</script>
   
-  <script src='../node_modules/holderjs/holder.js'></script>
+  <script src='../../node_modules/holderjs/holder.js'></script>
   
   <!-- Load the built library -->
-  <script src='../tmp/__spec-build.js'></script>
+  <script src='../../tmp/__spec-build.js'></script>
+
+  <link rel='stylesheet' href='style.css' />
 </head>
 <body>
-  <img id="image" src="holder.js/400x300">
+  <div id="element">
+    <img src="holder.js/400x300">
+  <div>
 </body>
 </html>
