@@ -51,7 +51,7 @@ class Transformable {
     rotation += t.rotate;
 
     //order : translation, scale, skew, rotation
-    const transform = `translate(${translation.x}px, ${translation.y}px) scale(${scale.x}, ${scale.y}) skew(${t.skew}) rotate(${rotation}deg)`;
+    const transform = `translate(${translation.x}px, ${translation.y}px) scale(${scale.x}, ${scale.y}) skew(${t.skew}deg) rotate(${rotation}deg)`;
     this.element.style.transform = transform;
   }
 
