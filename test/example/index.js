@@ -5,3 +5,5 @@ let container = document.getElementsByTagName('body')[0];
 let t = new Transformable(element, container);
 
 t.greet();
+
+window.transformable = t;
