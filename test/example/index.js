@@ -8,12 +8,12 @@ const events = [
   'rotation:start',
   'rotation:ongoing',
   'rotation:stop',
-  'translation:start',
-  'translation:ongoing',
-  'translation:stop',
-  'scaling:start',
-  'scaling:ongoing',
-  'scaling:stop',
+  'move:start',
+  'move:ongoing',
+  'move:stop',
+  'resize:start',
+  'resize:ongoing',
+  'resize:stop',
 ]
 
 for(let event of events) {

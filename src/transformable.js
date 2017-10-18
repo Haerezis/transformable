@@ -16,12 +16,12 @@ class Transformable {
     this.container = container;
 
     // Callback needs to have "this" bound or else "this" won't be the instance of the class.
-    this._scalingOnMousedownBound = this._scalingOnMousedown.bind(this);
-    this._scalingOnMousemoveBound = this._scalingOnMousemove.bind(this);
-    this._scalingOnMouseupBound = this._scalingOnMouseup.bind(this);
-    this._translationOnMousedownBound = this._translationOnMousedown.bind(this);
-    this._translationOnMousemoveBound = this._translationOnMousemove.bind(this);
-    this._translationOnMouseupBound = this._translationOnMouseup.bind(this);
+    this._resizeOnMousedownBound = this._resizeOnMousedown.bind(this);
+    this._resizeOnMousemoveBound = this._resizeOnMousemove.bind(this);
+    this._resizeOnMouseupBound = this._resizeOnMouseup.bind(this);
+    this._moveOnMousedownBound = this._moveOnMousedown.bind(this);
+    this._moveOnMousemoveBound = this._moveOnMousemove.bind(this);
+    this._moveOnMouseupBound = this._moveOnMouseup.bind(this);
     this._rotationOnMousedownBound = this._rotationOnMousedown.bind(this);
     this._rotationOnMousemoveBound = this._rotationOnMousemove.bind(this);
     this._rotationOnMouseupBound = this._rotationOnMouseup.bind(this);
@@ -39,6 +39,18 @@ class Transformable {
 
   enable() {
     this.handles.classList.remove('hidden');
+  }
+
+  move(dx, dy) {
+    this.element.style.top = `${this.element.offsetTop + dy}px`;
+    this.element.style.left = `${this.element.offsetLeft + dx}px`;
+  }
+
+  resize(dx, dy) {
+  }
+
+  rotate(angle) {
+    this.transform({x:0,y:0}, {x:0,y:0}, angle);
   }
 
   transform(translation, scale, rotation) {
@@ -72,29 +84,29 @@ class Transformable {
     this.element.insertAdjacentHTML('beforeend', '<div class="handles noselect"></div>');
     this.handles = this.element.querySelector('.handles');
 
-    this._addTranslationHandle();
-    this._addScalingHandles();
+    this._addMoveHandle();
+    this._addResizeHandles();
     this._addRotationHandle();
   }
 
-  _addScalingHandles() {
-    const handles = ['ul', 'ur', 'dl', 'dr'];
+  _addResizeHandles() {
+    const handles = ['ul', 'um', 'ur', 'ml', 'mr', 'dl', 'dm', 'dr'];
 
-    this.scaling_handles = {}
+    this.resize_handles = {}
     for(let handle of handles) {
-      this.handles.insertAdjacentHTML('beforeend', `<span class='scaling_handles ${handle}'></span>`);
-      this.scaling_handles[handle] = this.element.querySelector(`.scaling_handles.${handle}`)
-      this.scaling_handles[handle].addEventListener('mousedown', this._scalingOnMousedownBound);
+      this.handles.insertAdjacentHTML('beforeend', `<span class='resize_handles ${handle}'></span>`);
+      this.resize_handles[handle] = this.element.querySelector(`.resize_handles.${handle}`)
+      this.resize_handles[handle].addEventListener('mousedown', this._resizeOnMousedownBound);
     }
   }
 
-  _addTranslationHandle() {
+  _addMoveHandle() {
     this.handles.insertAdjacentHTML('beforeend', `
-        <span class='translation_handle'></span>
+        <span class='move_handle'></span>
     `);
 
-    this.translation_handle = this.element.querySelector('.translation_handle');
-    this.translation_handle.addEventListener('mousedown', this._translationOnMousedownBound);
+    this.move_handle = this.element.querySelector('.move_handle');
+    this.move_handle.addEventListener('mousedown', this._moveOnMousedownBound);
   }
 
   _addRotationHandle() {
@@ -112,59 +124,60 @@ class Transformable {
   /////////////////////////////////////////////
   
   ////////////
-  // translation callback
+  // move callback
   ////////////
   
-  _translationOnMousedown(event) {
-    this.emit('translation:start');
+  _moveOnMousedown(event) {
+    this.emit('move:start');
 
     this.currentMousePosition = { x: event.clientX, y: event.clientY };
 
-    this.container.addEventListener('mousemove', this._translationOnMousemoveBound);
-    this.container.addEventListener('mouseup', this._translationOnMouseupBound);
+    this.container.addEventListener('mousemove', this._moveOnMousemoveBound);
+    this.container.addEventListener('mouseup', this._moveOnMouseupBound);
   }
 
-  _translationOnMousemove(event) {
-    this.emit('translation:ongoing');
+  _moveOnMousemove(event) {
+    this.emit('move:ongoing');
 
-    const translation = {
+    const move = {
       x: event.clientX - this.currentMousePosition.x,
       y: event.clientY - this.currentMousePosition.y
     }
 
-    if(translation.x != 0 || translation.y != 0) {
-      this.transform(translation, {x:0,y:0}, 0);
+    if(move.x != 0 || move.y != 0) {
+      this.move(move.x, move.y);
+      //this.transform(move, {x:0,y:0}, 0);
       this.currentMousePosition = { x: event.clientX, y: event.clientY };
     }
   }
   
-  _translationOnMouseup(event) {
-    this.emit('translation:stop');
+  _moveOnMouseup(event) {
+    this.emit('move:stop');
 
-    this.container.removeEventListener('mousemove', this._translationOnMousemoveBound);
-    this.container.removeEventListener('mouseup', this._translationOnMouseupBound);
+    this.container.removeEventListener('mousemove', this._moveOnMousemoveBound);
+    this.container.removeEventListener('mouseup', this._moveOnMouseupBound);
   }
   
   ////////////
-  // scale callbacks
+  // resize callbacks
   ////////////
   
-  _scalingOnMousedown(event) {
-    this.emit('scaling:start');
+  _resizeOnMousedown(event) {
+    this.emit('resize:start');
 
-    this.container.addEventListener('mousemove', this._scalingOnMousemoveBound);
-    this.container.addEventListener('mouseup', this._scalingOnMouseupBound);
+    this.container.addEventListener('mousemove', this._resizeOnMousemoveBound);
+    this.container.addEventListener('mouseup', this._resizeOnMouseupBound);
   }
 
-  _scalingOnMousemove(event) {
-    this.emit('scaling:ongoing');
+  _resizeOnMousemove(event) {
+    this.emit('resize:ongoing');
   }
   
-  _scalingOnMouseup(event) {
-    this.emit('scaling:stop');
+  _resizeOnMouseup(event) {
+    this.emit('resize:stop');
 
-    this.container.removeEventListener('mousemove', this._scalingOnMousemoveBound);
-    this.container.removeEventListener('mouseup', this._scalingOnMouseupBound);
+    this.container.removeEventListener('mousemove', this._resizeOnMousemoveBound);
+    this.container.removeEventListener('mouseup', this._resizeOnMouseupBound);
   }
   
   ////////////
@@ -193,7 +206,7 @@ class Transformable {
     const angle = Utils.Angle(this.rotationOriginToMouse, originToMouse);
 
     if (angle != 0) {
-      this.transform({x:0,y:0}, {x:0,y:0}, angle);
+      this.rotate(angle);
       this.rotationOriginToMouse = originToMouse;
     }
   }
