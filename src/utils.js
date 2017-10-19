@@ -11,6 +11,11 @@ class Utils {
   static Cross(v1, v2) {
     return v1.x * v2.y - v1.y * v2.x;
   }
+
+  static Wrap(el, wrapper) {
+	    el.parentNode.insertBefore(wrapper, el);
+	    wrapper.appendChild(el);
+	}
 }
 
 export default Utils;

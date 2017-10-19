@@ -1,6 +1,8 @@
 html, 
 body {
     height: 100%;
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
 }
 
 .hidden {
@@ -10,12 +12,10 @@ body {
 
 #element {
   position: absolute;
-  top: 0px;
-  left: 0px;
+  top: 100px;
+  left: 100px;
   width: 400px;
   height: 300px;
-
-  transform: translate(100px, 100px);
 }
 
 #element img {
@@ -23,6 +23,17 @@ body {
   height: 100%;
 }
 
+#test {
+  position: absolute;
+  width:10px;
+  height:10px;
+  background:rgba(255,0,0);
+  z-index: 10;
+  transform-origin: left top;
+  top: 245px;
+  left: 295px
+  /*transform: translate(300px, 250px);*/
+}
 
 .handles {
   position: absolute;
@@ -49,15 +60,15 @@ body {
   height: 100%;
 }
 
-.resize_handles.ul {
+.resize_handles.tl {
   top:-8px;
   left:-8px;
 }
-.resize_handles.um {
+.resize_handles.tm {
   top:-9px;
   left:calc(50% - 8px);
 }
-.resize_handles.ur {
+.resize_handles.tr {
   top:-8px;
   right:-8px;
 }
@@ -69,15 +80,15 @@ body {
   top: calc(50% - 8px);
   right:-9px;
 }
-.resize_handles.dl {
+.resize_handles.bl {
   bottom:-8px;
   left:-8px;
 }
-.resize_handles.dm {
+.resize_handles.bm {
   bottom:-9px;
   left: calc(50% - 8px);
 }
-.resize_handles.dr {
+.resize_handles.br {
   bottom:-8px;
   right:-8px;
 }
