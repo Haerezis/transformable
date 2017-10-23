@@ -265,12 +265,26 @@ class Transformable {
   _resizeOnMousemove(event) {
     this.emit('resize:ongoing');
 
-    const delta = {
-      x: event.clientX - this.resizeInfos.mouse.x,
-      y: event.clientY - this.resizeInfos.mouse.y
+    const center = this.center();
+
+    let start = {
+      x: this.resizeInfos.mouse.x - center.x,
+      y: this.resizeInfos.mouse.y - center.y,
     }
-    const distance = Math.sqrt(delta.x * delta.x + delta.y * delta.y)
-    
+    let current = {
+      x: event.clientX - center.x,
+      y: event.clientY - center.y,
+    }
+
+    start = Utils.Rotate(start, -this.currentState.angle);
+    current = Utils.Rotate(current, -this.currentState.angle);
+
+    const delta = {
+      x: current.x - start.x,
+      y: current.y - start.y
+    }
+
+    //const distance = Math.sqrt(delta.x * delta.x + delta.y * delta.y)
 
     let resize = {
       left: 0,
