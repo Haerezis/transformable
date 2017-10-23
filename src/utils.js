@@ -12,6 +12,21 @@ class Utils {
     return v1.x * v2.y - v1.y * v2.x;
   }
 
+  static Rotate(point, angle) {
+    const radians = (Math.PI / 180) * angle;
+    const cos = Math.cos(radians);
+    const sin = Math.sin(radians);
+
+    return {
+      x: cos * point.x - sin * point.y,
+      y: cos * point.y + sin * point.x
+    }
+  }
+
+  static Dup(object) {
+    return JSON.parse(JSON.stringify(object));
+  }
+
   static Wrap(el, wrapper) {
 	    el.parentNode.insertBefore(wrapper, el);
 	    wrapper.appendChild(el);
