@@ -12,6 +12,10 @@ class Utils {
     return v1.x * v2.y - v1.y * v2.x;
   }
 
+  static Dup(object) {
+    return JSON.parse(JSON.stringify(object));
+  }
+
   static Wrap(el, wrapper) {
 	    el.parentNode.insertBefore(wrapper, el);
 	    wrapper.appendChild(el);

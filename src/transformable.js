@@ -26,7 +26,7 @@ class Transformable {
       },
       angle: 0
     };
-    this.currentState = this.lastState;
+    this.currentState = Utils.Dup(this.lastState);
 
     this.element.style.top = "0px";
     this.element.style.bottom = "0px";
@@ -107,8 +107,6 @@ class Transformable {
     if(resize.bottom != 0) {
       this.currentState.compensation.y += delta.y / 2;
     }
-
-    //TODO
   }
 
   rotateBy(angle) {
@@ -119,7 +117,7 @@ class Transformable {
     this.currentState.angle = angle;
   }
 
-  transform() {
+  transform(updateLastState = true) {
     const s = this.currentState;
     const transform = `
       translate(${s.x}px, ${s.y}px)
@@ -132,7 +130,9 @@ class Transformable {
     this.element.style.transform = transform;
     this.element.style.transformOrigin = 'left top';
 
-    this.lastState = s;
+    if(updateLastState) {
+      this.lastState = Utils.Dup(s);
+    }
   }
 
   center() {
@@ -279,28 +279,40 @@ class Transformable {
       bottom: 0
     }
     if (this.resizeInfos.resize.left) {
-      resize.left = -distance * Math.sign(delta.x);
+      resize.left = -delta.x;
     }
     if (this.resizeInfos.resize.right) {
-      resize.right = distance * Math.sign(delta.x)
+      resize.right = delta.x
     }
     if (this.resizeInfos.resize.top) {
-      resize.top = -distance * Math.sign(delta.y);
+      resize.top = -delta.y;
     }
     if (this.resizeInfos.resize.bottom) {
-      resize.bottom = distance * Math.sign(delta.y);
+      resize.bottom = delta.y;
     }
 
+    //if (this.resizeInfos.resize.left) {
+      //resize.left = -distance * Math.sign(delta.x);
+    //}
+    //if (this.resizeInfos.resize.right) {
+      //resize.right = distance * Math.sign(delta.x)
+    //}
+    //if (this.resizeInfos.resize.top) {
+      //resize.top = -distance * Math.sign(delta.y);
+    //}
+    //if (this.resizeInfos.resize.bottom) {
+      //resize.bottom = distance * Math.sign(delta.y);
+    //}
+
+    this.currentState = Utils.Dup(this.lastState);
     this.resizeBy(resize);
-    this.transform();
-    this.resizeInfos.mouse = {
-      x: event.clientX,
-      y: event.clientY
-    };
+    this.transform(false);
   }
   
   _resizeOnMouseup(event) {
     this.emit('resize:stop');
+
+    this.transform();
 
     this.container.removeEventListener('mousemove', this._resizeOnMousemoveBound);
     this.container.removeEventListener('mouseup', this._resizeOnMouseupBound);
