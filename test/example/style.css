@@ -18,7 +18,8 @@ body {
   height: 300px;
 }
 
-#element img {
+#element #item {
+  background: red;
   width : 100%;
   height: 100%;
 }
