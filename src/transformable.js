@@ -135,6 +135,15 @@ class Transformable {
     }
   }
 
+  normalize() {
+    const center = this.center();
+    console.log(center);
+    this.currentState.x = center.x;
+    this.currentState.y = center.y;
+    this.currentState.compensation = {x:0, y: 0};
+    this.transform();
+  }
+
   center() {
     const boundingRect = this.element.getBoundingClientRect();
 
@@ -228,6 +237,8 @@ class Transformable {
   
   _moveOnMouseup(event) {
     this.emit('move:stop');
+
+    this.normalize();
 
     this.container.removeEventListener('mousemove', this._moveOnMousemoveBound);
     this.container.removeEventListener('mouseup', this._moveOnMouseupBound);
@@ -326,7 +337,7 @@ class Transformable {
   _resizeOnMouseup(event) {
     this.emit('resize:stop');
 
-    this.transform();
+    this.normalize();
 
     this.container.removeEventListener('mousemove', this._resizeOnMousemoveBound);
     this.container.removeEventListener('mouseup', this._resizeOnMouseupBound);
@@ -369,6 +380,8 @@ class Transformable {
 
   _rotationOnMouseup(event) {
     this.emit('rotation:stop');
+    
+    this.normalize();
 
     this.container.removeEventListener('mousemove', this._rotationOnMousemoveBound);
     this.container.removeEventListener('mouseup', this._rotationOnMouseupBound);
