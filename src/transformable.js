@@ -38,6 +38,7 @@ class Transformable {
     this.rotationInfos = {};
 
     this.rotationStep = 5;
+    this.minimumSize = 10;
 
     // Callback needs to have "this" bound or else "this" won't be the instance of the class.
     this._resizeOnMousedownBound = this._resizeOnMousedown.bind(this);
@@ -52,11 +53,7 @@ class Transformable {
 
     this._addHandles();
 
-    this.transform();
-  }
-
-  greet() {
-    console.log('hello world');
+    this.update();
   }
 
   disable() {
@@ -84,26 +81,30 @@ class Transformable {
     resize.top = resize.top || 0;
     resize.bottom = resize.bottom || 0;
 
-    const delta = {
+    let delta = {
       x: resize.right + resize.left,
       y: resize.top + resize.bottom
     }
 
+    if (this.currentState.width + delta.x < this.minimumSize) {
+      delta.x = this.minimumSize - this.currentState.width;
+    }
+    if (this.currentState.height + delta.y < this.minimumSize) {
+      delta.y = this.minimumSize - this.currentState.height;
+    }
+
     this.currentState.width += delta.x;
-    this.currentState.height += delta.y;
-    
     if(resize.left != 0) {
       this.currentState.compensation.x -= delta.x / 2; 
     }
-
-    if(resize.top != 0) {
-      this.currentState.compensation.y -= delta.y / 2; 
-    }
-
     if(resize.right != 0) {
       this.currentState.compensation.x += delta.x / 2;
     }
 
+    this.currentState.height += delta.y;
+    if(resize.top != 0) {
+      this.currentState.compensation.y -= delta.y / 2; 
+    }
     if(resize.bottom != 0) {
       this.currentState.compensation.y += delta.y / 2;
     }
@@ -117,32 +118,11 @@ class Transformable {
     this.currentState.angle = angle;
   }
 
-  transform(updateLastState = true) {
-    const s = this.currentState;
-    const transform = `
-      translate(${s.x}px, ${s.y}px)
-      rotate(${s.angle}deg)
-      translate(calc(${s.compensation.x}px - 50%), calc(${s.compensation.y}px - 50%))
-      `;
-
-    this.element.style.width = `${s.width}px`;
-    this.element.style.height = `${s.height}px`;
-    this.element.style.transform = transform;
-    this.element.style.transformOrigin = 'left top';
-
-    if(updateLastState) {
-      this.lastState = Utils.Dup(s);
-    }
+  update() {
+    this._transform(true);
+    this._normalize();
   }
 
-  normalize() {
-    const center = this.center();
-    console.log(center);
-    this.currentState.x = center.x;
-    this.currentState.y = center.y;
-    this.currentState.compensation = {x:0, y: 0};
-    this.transform();
-  }
 
   center() {
     const boundingRect = this.element.getBoundingClientRect();
@@ -151,6 +131,22 @@ class Transformable {
       x: boundingRect.left + (boundingRect.width / 2),
       y: boundingRect.top + (boundingRect.height / 2)
     }
+  }
+
+  width() {
+    return this.currentState.width;
+  }
+
+  height() {
+    return this.currentState.height;
+  }
+
+  position() {
+    return { x: this.currentState.x, y: this.currentState.y };
+  }
+
+  angle() {
+    return this.currentState.angle;
   }
 
   ////////////////////////////////////////////
@@ -195,6 +191,32 @@ class Transformable {
     this.rotation_handle.addEventListener('mousedown', this._rotationOnMousedownBound);
   }
 
+  _transform(updateLastState = true) {
+    const s = this.currentState;
+    const transform = `
+      translate(${s.x}px, ${s.y}px)
+      rotate(${s.angle}deg)
+      translate(calc(${s.compensation.x}px - 50%), calc(${s.compensation.y}px - 50%))
+      `;
+
+    this.element.style.width = `${s.width}px`;
+    this.element.style.height = `${s.height}px`;
+    this.element.style.transform = transform;
+    this.element.style.transformOrigin = 'left top';
+
+    if(updateLastState) {
+      this.lastState = Utils.Dup(s);
+    }
+  }
+
+  _normalize() {
+    const center = this.center();
+    this.currentState.x = center.x;
+    this.currentState.y = center.y;
+    this.currentState.compensation = {x:0, y: 0};
+    this._transform();
+  }
+
 
   //////////////////////////////////////////////
   // CALLBACK
@@ -219,7 +241,7 @@ class Transformable {
       };
 
       this.container.addEventListener('mousemove', this._moveOnMousemoveBound);
-      this.container.addEventListener('mouseup', this._moveOnMouseupBound);
+      document.addEventListener('mouseup', this._moveOnMouseupBound);
     }
   }
 
@@ -232,16 +254,16 @@ class Transformable {
     }
 
     this.moveTo(move);
-    this.transform();
+    this._transform();
   }
   
   _moveOnMouseup(event) {
     this.emit('move:stop');
 
-    this.normalize();
+    this.update();
 
     this.container.removeEventListener('mousemove', this._moveOnMousemoveBound);
-    this.container.removeEventListener('mouseup', this._moveOnMouseupBound);
+    document.removeEventListener('mouseup', this._moveOnMouseupBound);
   }
   
   ////////////
@@ -269,15 +291,15 @@ class Transformable {
 
 
       this.container.addEventListener('mousemove', this._resizeOnMousemoveBound);
-      this.container.addEventListener('mouseup', this._resizeOnMouseupBound);
+      document.addEventListener('mouseup', this._resizeOnMouseupBound);
     }
   }
 
   _resizeOnMousemove(event) {
     this.emit('resize:ongoing');
 
+    //Rotate start and current mouse position to match this.element rotated referentiel
     const center = this.center();
-
     let start = {
       x: this.resizeInfos.mouse.x - center.x,
       y: this.resizeInfos.mouse.y - center.y,
@@ -286,16 +308,14 @@ class Transformable {
       x: event.clientX - center.x,
       y: event.clientY - center.y,
     }
-
     start = Utils.Rotate(start, -this.currentState.angle);
     current = Utils.Rotate(current, -this.currentState.angle);
 
+    
     const delta = {
       x: current.x - start.x,
       y: current.y - start.y
     }
-
-    //const distance = Math.sqrt(delta.x * delta.x + delta.y * delta.y)
 
     let resize = {
       left: 0,
@@ -316,31 +336,19 @@ class Transformable {
       resize.bottom = delta.y;
     }
 
-    //if (this.resizeInfos.resize.left) {
-      //resize.left = -distance * Math.sign(delta.x);
-    //}
-    //if (this.resizeInfos.resize.right) {
-      //resize.right = distance * Math.sign(delta.x)
-    //}
-    //if (this.resizeInfos.resize.top) {
-      //resize.top = -distance * Math.sign(delta.y);
-    //}
-    //if (this.resizeInfos.resize.bottom) {
-      //resize.bottom = distance * Math.sign(delta.y);
-    //}
 
     this.currentState = Utils.Dup(this.lastState);
     this.resizeBy(resize);
-    this.transform(false);
+    this._transform(false);
   }
   
   _resizeOnMouseup(event) {
     this.emit('resize:stop');
 
-    this.normalize();
+    this.update();
 
     this.container.removeEventListener('mousemove', this._resizeOnMousemoveBound);
-    this.container.removeEventListener('mouseup', this._resizeOnMouseupBound);
+    document.removeEventListener('mouseup', this._resizeOnMouseupBound);
   }
   
   ////////////
@@ -359,7 +367,7 @@ class Transformable {
       }
 
       this.container.addEventListener('mousemove', this._rotationOnMousemoveBound);
-      this.container.addEventListener('mouseup', this._rotationOnMouseupBound);
+      document.addEventListener('mouseup', this._rotationOnMouseupBound);
     }
   }
 
@@ -375,16 +383,16 @@ class Transformable {
     angle = Math.round(angle / this.rotationStep) * this.rotationStep;
     
     this.rotateTo(this.rotationInfos.angle + angle);
-    this.transform();
+    this._transform();
   }
 
   _rotationOnMouseup(event) {
     this.emit('rotation:stop');
     
-    this.normalize();
+    this.update();
 
     this.container.removeEventListener('mousemove', this._rotationOnMousemoveBound);
-    this.container.removeEventListener('mouseup', this._rotationOnMouseupBound);
+    document.removeEventListener('mouseup', this._rotationOnMouseupBound);
   }
 }
 

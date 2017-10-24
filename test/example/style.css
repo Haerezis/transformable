@@ -10,7 +10,7 @@ body {
   visibility: hidden;
 }
 
-#element {
+#element1 {
   position: absolute;
   top: 100px;
   left: 100px;
@@ -18,8 +18,22 @@ body {
   height: 200px;
 }
 
-#element #item {
+#element1 #item1 {
   background: red;
+  width : 100%;
+  height: 100%;
+}
+
+#element2 {
+  position: absolute;
+  top: 100px;
+  left: 500px;
+  width: 200px;
+  height: 200px;
+}
+
+#element2 #item2 {
+  background: blue;
   width : 100%;
   height: 100%;
 }

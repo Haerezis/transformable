@@ -1,25 +1,8 @@
 import Transformable from '../../src/transformable';
 
-let element = document.getElementById('element');
+let element1 = document.getElementById('element1');
+let element2 = document.getElementById('element2');
 let container = document.getElementsByTagName('body')[0];
-let t = new Transformable(element, container);
+window.transformable1 = new Transformable(element1, container);
+window.transformable2 = new Transformable(element2, container);
 
-const events = [
-  'rotation:start',
-  'rotation:ongoing',
-  'rotation:stop',
-  'move:start',
-  'move:ongoing',
-  'move:stop',
-  'resize:start',
-  'resize:ongoing',
-  'resize:stop',
-]
-
-for(let event of events) {
-  t.on(event, () => console.log(event));
-}
-
-t.greet();
-
-window.transformable = t;
