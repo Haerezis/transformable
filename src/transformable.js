@@ -8,6 +8,12 @@ class Transformable {
   //// PUBLIC
   ////////////////////////////////////////////
   
+  /**
+   * Create a Transformable instance
+   * @constructor
+   * @param element - The DOM element to attach to.
+   * @param container - The DOM element that where the mousemove event will be detected.
+   */
   constructor(element, container) {
     // Mixing minivent to this instance for on/off/this.emit methods
     Events(this);
@@ -56,25 +62,44 @@ class Transformable {
     this.update();
   }
 
+  /**
+   * Disable the handles (and thus interaction with the Transformable instance).
+   */
   disable() {
     this.handles.classList.add('hidden');
   }
 
+  /**
+   * Enable the handles.
+   */
   enable() {
     this.handles.classList.remove('hidden');
   }
 
+  /**
+   * Move the Transformable by an increment.
+   * @param {Object} inc - the position increment => {x: 42, y: 42}.
+   */
   moveBy(inc) {
     this.currentState.x += inc.x;
     this.currentState.y += inc.y;
   }
 
+  /**
+   * Move the Transformable to a specific position.
+   * Warning : the Transformable's origin is not the top left but the center.
+   *
+   * @param {Object} position - the position where the element should be moved => {x: 42, y: 42}.
+   */
   moveTo(position) {
     this.currentState.x = position.x;
     this.currentState.y = position.y;
   }
 
-  //resize = {left:a, top:b, right:c, bottom:d}
+  /**
+   * Resize the Transformable by an increment.
+   * @param {Object} resize - The resize values for the 4 sides of the element => {left:a, top:b, right:c, bottom:d}.
+   */
   resizeBy(resize) {
     resize.left = resize.left || 0;
     resize.right = resize.right || 0;
@@ -110,20 +135,33 @@ class Transformable {
     }
   }
 
+  /**
+   * Rotate the Transformable by an angle.
+   * @param {Integer} angle - the angle to rotate to (in degree).
+   */
   rotateBy(angle) {
     this.currentState.angle += angle;
   }
 
+  /**
+   * Set the rotation angle of the Transformable.
+   * @param {Integer} angle - the angle of the element after rotation (in degree).
+   */
   rotateTo(angle) {
     this.currentState.angle = angle;
   }
 
+  /**
+   * Update the display of the Transformable based on its internal state.
+   */
   update() {
     this._transform(true);
     this._normalize();
   }
 
-
+  /**
+   * Get the center position of the Transformable.
+   */
   center() {
     const boundingRect = this.element.getBoundingClientRect();
 
@@ -133,18 +171,30 @@ class Transformable {
     }
   }
 
+  /**
+   * Get the current width of the Transformable.
+   */
   width() {
     return this.currentState.width;
   }
 
+  /**
+   * Get the current height of the Transformable.
+   */
   height() {
     return this.currentState.height;
   }
 
+  /**
+   * Get the current position of the Transformable.
+   */
   position() {
     return { x: this.currentState.x, y: this.currentState.y };
   }
 
+  /**
+   * Get the current angle (in degree) of the Transformable.
+   */
   angle() {
     return this.currentState.angle;
   }
