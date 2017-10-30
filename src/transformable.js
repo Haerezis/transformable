@@ -163,11 +163,12 @@ class Transformable {
    * Get the center position of the Transformable.
    */
   center() {
+    const containerBoundingBox = this.container.getBoundingClientRect();
     const boundingRect = this.element.getBoundingClientRect();
 
     return {
-      x: boundingRect.left + (boundingRect.width / 2),
-      y: boundingRect.top + (boundingRect.height / 2)
+      x: boundingRect.left - containerBoundingBox.left + (boundingRect.width / 2),
+      y: boundingRect.top - containerBoundingBox.top + (boundingRect.height / 2)
     }
   }
 
