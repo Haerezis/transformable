@@ -263,7 +263,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    /**
-	     * Get the center position of the Transformable.
+	     * Get the center position (inside the container) of the Transformable.
 	     */
 	
 	  }, {
@@ -272,10 +272,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var containerBoundingBox = this.container.getBoundingClientRect();
 	      var boundingRect = this.element.getBoundingClientRect();
 	
-	      return {
-	        x: boundingRect.left - containerBoundingBox.left + boundingRect.width / 2,
-	        y: boundingRect.top - containerBoundingBox.top + boundingRect.height / 2
-	      };
+	      return this._positionFromWorldToContainer({
+	        x: boundingRect.left + boundingRect.width / 2,
+	        y: boundingRect.top + boundingRect.height / 2
+	      });
 	    }
 	
 	    /**
@@ -381,6 +381,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.rotation_handle = this.element.querySelector('.rotation_handle');
 	      this.rotation_handle.addEventListener('mousedown', this._rotationOnMousedownBound);
 	    }
+	
+	    /**
+	     * Apply current state transformation to the element
+	     * @param {Boolean} updateLastState update this.lastState to this.currentState if true at the end of the method.
+	     */
+	
 	  }, {
 	    key: '_transform',
 	    value: function _transform() {
@@ -398,6 +404,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.lastState = _utils2.default.Dup(s);
 	      }
 	    }
+	
+	    /**
+	     * Normalize the current position and clear compensation.
+	     */
+	
 	  }, {
 	    key: '_normalize',
 	    value: function _normalize() {
@@ -406,6 +417,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.currentState.y = center.y;
 	      this.currentState.compensation = { x: 0, y: 0 };
 	      this._transform();
+	    }
+	
+	    /**
+	     * Transform the given world position into a position relative to the container given.
+	     * @param {Object} pos - The world position to transform => {x:a, y:b}.
+	     */
+	
+	  }, {
+	    key: '_positionFromWorldToContainer',
+	    value: function _positionFromWorldToContainer(pos) {
+	      var containerBoundingBox = this.container.getBoundingClientRect();
+	
+	      return {
+	        x: pos.x - containerBoundingBox.left,
+	        y: pos.y - containerBoundingBox.top
+	      };
 	    }
 	
 	    //////////////////////////////////////////////
@@ -427,10 +454,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	          x: this.currentState.x,
 	          y: this.currentState.y
 	        };
-	        this.moveInfos.mouse = {
+	        this.moveInfos.mouse = this._positionFromWorldToContainer({
 	          x: event.clientX,
 	          y: event.clientY
-	        };
+	        });
 	
 	        this.container.addEventListener('mousemove', this._moveOnMousemoveBound);
 	        document.addEventListener('mouseup', this._moveOnMouseupBound);
@@ -441,9 +468,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _moveOnMousemove(event) {
 	      this.emit('move:ongoing');
 	
+	      var relativePosition = this._positionFromWorldToContainer({
+	        x: event.clientX,
+	        y: event.clientY
+	      });
 	      var move = {
-	        x: event.clientX - this.moveInfos.mouse.x + this.moveInfos.initial.x,
-	        y: event.clientY - this.moveInfos.mouse.y + this.moveInfos.initial.y
+	        x: relativePosition.x - this.moveInfos.mouse.x + this.moveInfos.initial.x,
+	        y: relativePosition.y - this.moveInfos.mouse.y + this.moveInfos.initial.y
 	      };
 	
 	      this.moveTo(move);
@@ -482,10 +513,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	          top: handleClass.includes('t'),
 	          bottom: handleClass.includes('b')
 	        };
-	        this.resizeInfos.mouse = {
+	        this.resizeInfos.mouse = this._positionFromWorldToContainer({
 	          x: event.clientX,
 	          y: event.clientY
-	        };
+	        });
 	
 	        this.container.addEventListener('mousemove', this._resizeOnMousemoveBound);
 	        document.addEventListener('mouseup', this._resizeOnMouseupBound);
@@ -496,6 +527,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _resizeOnMousemove(event) {
 	      this.emit('resize:ongoing');
 	
+	      var relativePosition = this._positionFromWorldToContainer({
+	        x: event.clientX,
+	        y: event.clientY
+	      });
+	
 	      //Rotate start and current mouse position to match this.element rotated referentiel
 	      var center = this.center();
 	      var start = {
@@ -503,8 +539,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        y: this.resizeInfos.mouse.y - center.y
 	      };
 	      var current = {
-	        x: event.clientX - center.x,
-	        y: event.clientY - center.y
+	        x: relativePosition.x - center.x,
+	        y: relativePosition.y - center.y
 	      };
 	      start = _utils2.default.Rotate(start, -this.currentState.angle);
 	      current = _utils2.default.Rotate(current, -this.currentState.angle);
@@ -559,11 +595,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (event.button == 0) {
 	        this.emit('rotation:start');
 	
+	        var relativePosition = this._positionFromWorldToContainer({
+	          x: event.clientX,
+	          y: event.clientY
+	        });
+	
 	        this.rotationInfos.angle = this.currentState.angle;
 	        this.rotationInfos.center = this.center();
 	        this.rotationInfos.centerToMouse = {
-	          x: event.clientX - this.rotationInfos.center.x,
-	          y: this.rotationInfos.center.y - event.clientY
+	          x: relativePosition.x - this.rotationInfos.center.x,
+	          y: this.rotationInfos.center.y - relativePosition.y
 	        };
 	
 	        this.container.addEventListener('mousemove', this._rotationOnMousemoveBound);
@@ -575,9 +616,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _rotationOnMousemove(event) {
 	      this.emit('rotation:ongoing');
 	
+	      var relativePosition = this._positionFromWorldToContainer({
+	        x: event.clientX,
+	        y: event.clientY
+	      });
+	
 	      var centerToMouse = {
-	        x: event.clientX - this.rotationInfos.center.x,
-	        y: this.rotationInfos.center.y - event.clientY
+	        x: relativePosition.x - this.rotationInfos.center.x,
+	        y: this.rotationInfos.center.y - relativePosition.y
 	      };
 	
 	      var angle = _utils2.default.Angle(this.rotationInfos.centerToMouse, centerToMouse);
