@@ -21,9 +21,10 @@ class Transformable {
     this.element = element;
     this.container = container;
 
+    const center = this.center();
     this.lastState = {
-      x: this.element.offsetLeft + this.element.offsetWidth / 2,
-      y: this.element.offsetTop + this.element.offsetHeight / 2,
+      x: center.x,
+      y: center.y,
       width: this.element.offsetWidth,
       height: this.element.offsetHeight,
       compensation: {
@@ -60,6 +61,7 @@ class Transformable {
     this._addHandles();
 
     this.update();
+    debugger;
   }
 
   /**
@@ -300,8 +302,6 @@ class Transformable {
   _moveOnMousedown(event) {
     //If left mouse
     if (event.button == 0) {
-      this.emit('move:start');
-
       this.moveInfos.initial = {
         x: this.currentState.x,
         y: this.currentState.y
@@ -313,12 +313,12 @@ class Transformable {
 
       this.container.addEventListener('mousemove', this._moveOnMousemoveBound);
       document.addEventListener('mouseup', this._moveOnMouseupBound);
+
+      this.emit('move:start');
     }
   }
 
   _moveOnMousemove(event) {
-    this.emit('move:ongoing');
-
     const relativePosition = this._positionFromWorldToContainer({
       x: event.clientX,
       y: event.clientY
@@ -330,15 +330,17 @@ class Transformable {
 
     this.moveTo(move);
     this._transform();
+
+    this.emit('move:ongoing');
   }
   
   _moveOnMouseup(event) {
-    this.emit('move:stop');
-
     this.update();
 
     this.container.removeEventListener('mousemove', this._moveOnMousemoveBound);
     document.removeEventListener('mouseup', this._moveOnMouseupBound);
+    
+    this.emit('move:stop');
   }
   
   ////////////
@@ -371,8 +373,6 @@ class Transformable {
   }
 
   _resizeOnMousemove(event) {
-    this.emit('resize:ongoing');
-    
     const relativePosition = this._positionFromWorldToContainer({
       x: event.clientX,
       y: event.clientY
@@ -420,15 +420,17 @@ class Transformable {
     this.currentState = Utils.Dup(this.lastState);
     this.resizeBy(resize);
     this._transform(false);
+
+    this.emit('resize:ongoing');
   }
   
   _resizeOnMouseup(event) {
-    this.emit('resize:stop');
-
     this.update();
 
     this.container.removeEventListener('mousemove', this._resizeOnMousemoveBound);
     document.removeEventListener('mouseup', this._resizeOnMouseupBound);
+    
+    this.emit('resize:stop');
   }
   
   ////////////
@@ -437,8 +439,6 @@ class Transformable {
   _rotationOnMousedown(event) {
     //If left mouse
     if (event.button == 0) {
-      this.emit('rotation:start');
-
       const relativePosition = this._positionFromWorldToContainer({
         x: event.clientX,
         y: event.clientY
@@ -453,12 +453,12 @@ class Transformable {
 
       this.container.addEventListener('mousemove', this._rotationOnMousemoveBound);
       document.addEventListener('mouseup', this._rotationOnMouseupBound);
+      
+      this.emit('rotation:start');
     }
   }
 
   _rotationOnMousemove(event) {
-    this.emit('rotation:ongoing');
-    
     const relativePosition = this._positionFromWorldToContainer({
       x: event.clientX,
       y: event.clientY
@@ -474,15 +474,17 @@ class Transformable {
     
     this.rotateTo(this.rotationInfos.angle + angle);
     this._transform();
+    
+    this.emit('rotation:ongoing');
   }
 
   _rotationOnMouseup(event) {
-    this.emit('rotation:stop');
-    
     this.update();
 
     this.container.removeEventListener('mousemove', this._rotationOnMousemoveBound);
     document.removeEventListener('mouseup', this._rotationOnMouseupBound);
+    
+    this.emit('rotation:stop');
   }
 }
 

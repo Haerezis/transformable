@@ -99,9 +99,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.element = element;
 	    this.container = container;
 	
+	    var center = this.center();
 	    this.lastState = {
-	      x: this.element.offsetLeft + this.element.offsetWidth / 2,
-	      y: this.element.offsetTop + this.element.offsetHeight / 2,
+	      x: center.x,
+	      y: center.y,
 	      width: this.element.offsetWidth,
 	      height: this.element.offsetHeight,
 	      compensation: {
@@ -138,6 +139,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._addHandles();
 	
 	    this.update();
+	    debugger;
 	  }
 	
 	  /**
@@ -448,8 +450,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _moveOnMousedown(event) {
 	      //If left mouse
 	      if (event.button == 0) {
-	        this.emit('move:start');
-	
 	        this.moveInfos.initial = {
 	          x: this.currentState.x,
 	          y: this.currentState.y
@@ -461,13 +461,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        this.container.addEventListener('mousemove', this._moveOnMousemoveBound);
 	        document.addEventListener('mouseup', this._moveOnMouseupBound);
+	
+	        this.emit('move:start');
 	      }
 	    }
 	  }, {
 	    key: '_moveOnMousemove',
 	    value: function _moveOnMousemove(event) {
-	      this.emit('move:ongoing');
-	
 	      var relativePosition = this._positionFromWorldToContainer({
 	        x: event.clientX,
 	        y: event.clientY
@@ -479,16 +479,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      this.moveTo(move);
 	      this._transform();
+	
+	      this.emit('move:ongoing');
 	    }
 	  }, {
 	    key: '_moveOnMouseup',
 	    value: function _moveOnMouseup(event) {
-	      this.emit('move:stop');
-	
 	      this.update();
 	
 	      this.container.removeEventListener('mousemove', this._moveOnMousemoveBound);
 	      document.removeEventListener('mouseup', this._moveOnMouseupBound);
+	
+	      this.emit('move:stop');
 	    }
 	
 	    ////////////
@@ -525,8 +527,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_resizeOnMousemove',
 	    value: function _resizeOnMousemove(event) {
-	      this.emit('resize:ongoing');
-	
 	      var relativePosition = this._positionFromWorldToContainer({
 	        x: event.clientX,
 	        y: event.clientY
@@ -572,16 +572,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.currentState = _utils2.default.Dup(this.lastState);
 	      this.resizeBy(resize);
 	      this._transform(false);
+	
+	      this.emit('resize:ongoing');
 	    }
 	  }, {
 	    key: '_resizeOnMouseup',
 	    value: function _resizeOnMouseup(event) {
-	      this.emit('resize:stop');
-	
 	      this.update();
 	
 	      this.container.removeEventListener('mousemove', this._resizeOnMousemoveBound);
 	      document.removeEventListener('mouseup', this._resizeOnMouseupBound);
+	
+	      this.emit('resize:stop');
 	    }
 	
 	    ////////////
@@ -593,8 +595,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _rotationOnMousedown(event) {
 	      //If left mouse
 	      if (event.button == 0) {
-	        this.emit('rotation:start');
-	
 	        var relativePosition = this._positionFromWorldToContainer({
 	          x: event.clientX,
 	          y: event.clientY
@@ -609,13 +609,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        this.container.addEventListener('mousemove', this._rotationOnMousemoveBound);
 	        document.addEventListener('mouseup', this._rotationOnMouseupBound);
+	
+	        this.emit('rotation:start');
 	      }
 	    }
 	  }, {
 	    key: '_rotationOnMousemove',
 	    value: function _rotationOnMousemove(event) {
-	      this.emit('rotation:ongoing');
-	
 	      var relativePosition = this._positionFromWorldToContainer({
 	        x: event.clientX,
 	        y: event.clientY
@@ -631,16 +631,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      this.rotateTo(this.rotationInfos.angle + angle);
 	      this._transform();
+	
+	      this.emit('rotation:ongoing');
 	    }
 	  }, {
 	    key: '_rotationOnMouseup',
 	    value: function _rotationOnMouseup(event) {
-	      this.emit('rotation:stop');
-	
 	      this.update();
 	
 	      this.container.removeEventListener('mousemove', this._rotationOnMousemoveBound);
 	      document.removeEventListener('mouseup', this._rotationOnMouseupBound);
+	
+	      this.emit('rotation:stop');
 	    }
 	  }]);
 	
