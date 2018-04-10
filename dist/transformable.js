@@ -139,7 +139,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._addHandles();
 	
 	    this.update();
-	    debugger;
 	  }
 	
 	  /**

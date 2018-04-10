@@ -61,7 +61,6 @@ class Transformable {
     this._addHandles();
 
     this.update();
-    debugger;
   }
 
   /**
