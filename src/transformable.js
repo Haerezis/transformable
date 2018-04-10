@@ -22,6 +22,7 @@ class Transformable {
     this.container = container;
 
     const center = this.center();
+    const matrix = unmatrix(this.element);
     this.lastState = {
       x: center.x,
       y: center.y,
@@ -31,7 +32,7 @@ class Transformable {
         x: 0,
         y: 0
       },
-      angle: 0
+      angle: matrix.rotate
     };
     this.currentState = Utils.Dup(this.lastState);
 

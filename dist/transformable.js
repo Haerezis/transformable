@@ -100,6 +100,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.container = container;
 	
 	    var center = this.center();
+	    var matrix = (0, _unmatrix2.default)(this.element);
 	    this.lastState = {
 	      x: center.x,
 	      y: center.y,
@@ -109,7 +110,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        x: 0,
 	        y: 0
 	      },
-	      angle: 0
+	      angle: matrix.rotate
 	    };
 	    this.currentState = _utils2.default.Dup(this.lastState);
 	
